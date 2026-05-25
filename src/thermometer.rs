@@ -1,3 +1,6 @@
+use crate::Report;
+
+#[derive(Debug)]
 pub struct SmartThermometer {
     temperature: f32,
 }
@@ -9,6 +12,12 @@ impl SmartThermometer {
 
     pub fn get_temperature(&self) -> f32 {
         self.temperature
+    }
+}
+
+impl Report for SmartThermometer {
+    fn report(&self) -> String {
+        format!("Умный термометр. Температура: {}°C", self.get_temperature())
     }
 }
 

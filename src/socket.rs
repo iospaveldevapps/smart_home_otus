@@ -1,3 +1,6 @@
+use crate::Report;
+
+#[derive(Debug)]
 pub struct SmartSocket {
     is_on: bool,
     power: f32,
@@ -22,6 +25,16 @@ impl SmartSocket {
 
     pub fn get_power(&self) -> f32 {
         if self.is_on { self.power } else { 0.0 }
+    }
+}
+
+impl Report for SmartSocket {
+    fn report(&self) -> String {
+        format!(
+            "Умная розетка. Включена: {}. Текущая мощность: {} W",
+            self.is_on(),
+            self.get_power()
+        )
     }
 }
 

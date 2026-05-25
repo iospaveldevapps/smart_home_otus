@@ -1,26 +1,28 @@
-use crate::{SmartSocket, SmartThermometer};
+use crate::{Report, SmartSocket, SmartThermometer};
 
+#[derive(Debug)]
 pub enum SmartDevice {
     Thermometer(SmartThermometer),
     Socket(SmartSocket),
 }
 
-impl SmartDevice {
-    pub fn print_state(&self) {
+impl From<SmartSocket> for SmartDevice {
+    fn from(socket: SmartSocket) -> Self {
+        Self::Socket(socket)
+    }
+}
+
+impl From<SmartThermometer> for SmartDevice {
+    fn from(thermometer: SmartThermometer) -> Self {
+        Self::Thermometer(thermometer)
+    }
+}
+
+impl Report for SmartDevice {
+    fn report(&self) -> String {
         match self {
-            SmartDevice::Thermometer(thermometer) => {
-                println!(
-                    "Умный термометр. Температура: {}°C",
-                    thermometer.get_temperature()
-                );
-            }
-            SmartDevice::Socket(socket) => {
-                println!(
-                    "Умная розетка. Включена: {}. Текущая мощность: {} W",
-                    socket.is_on(),
-                    socket.get_power()
-                );
-            }
+            SmartDevice::Thermometer(thermometer) => thermometer.report(),
+            SmartDevice::Socket(socket) => socket.report(),
         }
     }
 }

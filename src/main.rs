@@ -1,3 +1,6 @@
+mod report_service;
+
+use report_service::print_report;
 use smart_home::{Report, SmartDevice, SmartHome, SmartSocket, SmartThermometer, smart_room};
 
 fn main() {
@@ -21,7 +24,15 @@ fn main() {
         socket.turn_off();
     }
 
-    home.print_report();
+    print_report(&home);
+
+    if let Some(room) = home.get_room("living room") {
+        print_report(room);
+    }
+
+    if let Ok(device) = home.get_smart_device("living room", "socket") {
+        print_report(device);
+    }
 
     home.remove_room("kitchen");
     home.add_room(
@@ -29,8 +40,7 @@ fn main() {
         smart_room!(("thermometer", SmartThermometer::new(19.5))),
     );
 
-    println!();
-    home.print_report();
+    print_report(&home);
 
     match home.get_smart_device("kitchen", "socket") {
         Ok(device) => println!("Найдено устройство: {}", device.report()),

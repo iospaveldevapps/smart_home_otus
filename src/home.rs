@@ -101,14 +101,10 @@ impl Report for SmartHome {
             return report;
         }
 
-        let mut room_names: Vec<_> = self.rooms.keys().collect();
-        room_names.sort();
+        let mut rooms: Vec<_> = self.rooms.iter().collect();
+        rooms.sort_by(|(left_name, _), (right_name, _)| left_name.cmp(right_name));
 
-        for name in room_names {
-            let room = self
-                .rooms
-                .get(name)
-                .expect("room name was read from the same map");
+        for (name, room) in rooms {
             report.push_str(&format!("\nКомната `{}`:\n{}", name, room.report()));
         }
 

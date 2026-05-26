@@ -43,18 +43,12 @@ impl Report for Room {
             return "  Нет устройств.".to_string();
         }
 
-        let mut device_names: Vec<_> = self.devices.keys().collect();
-        device_names.sort();
+        let mut devices: Vec<_> = self.devices.iter().collect();
+        devices.sort_by(|(left_name, _), (right_name, _)| left_name.cmp(right_name));
 
-        device_names
+        devices
             .into_iter()
-            .map(|name| {
-                let device = self
-                    .devices
-                    .get(name)
-                    .expect("device name was read from the same map");
-                format!("  Устройство `{}`: {}", name, device.report())
-            })
+            .map(|(name, device)| format!("  Устройство `{}`: {}", name, device.report()))
             .collect::<Vec<_>>()
             .join("\n")
     }

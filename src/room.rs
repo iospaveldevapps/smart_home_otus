@@ -75,7 +75,7 @@ macro_rules! smart_room {
 #[cfg(test)]
 mod tests {
     use super::Room;
-    use crate::{Report, SmartDevice, SmartSocket, SmartThermometer, smart_room};
+    use crate::{Report, SmartDevice, SmartSocket, SmartThermometer};
 
     #[test]
     fn returns_device_by_key() {
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn macro_builds_room_from_devices() {
-        let room = smart_room!(
+        let room = crate::smart_room!(
             ("thermometer", SmartThermometer::new(22.0)),
             ("socket", SmartSocket::new(true, 100.0)),
         );
@@ -138,7 +138,7 @@ mod tests {
 
     #[test]
     fn report_contains_all_devices() {
-        let room = smart_room! {
+        let room = crate::smart_room! {
             "socket" => SmartSocket::new(true, 100.0),
             "thermometer" => SmartThermometer::new(22.0),
         };

@@ -21,7 +21,9 @@ fn main() {
     home.add_room("kitchen", kitchen);
 
     if let Ok(SmartDevice::Socket(socket)) = home.get_smart_device_mut("living room", "socket") {
-        socket.turn_off();
+        socket
+            .turn_off()
+            .expect("локальная розетка не может вернуть ошибку");
     }
 
     print_report(&home);

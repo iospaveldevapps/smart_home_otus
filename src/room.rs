@@ -85,7 +85,7 @@ mod tests {
 
         match room.get_device("thermometer") {
             Some(SmartDevice::Thermometer(thermometer)) => {
-                assert_eq!(thermometer.get_temperature(), 22.0);
+                assert_eq!(thermometer.get_temperature().unwrap(), 22.0);
             }
             _ => panic!("expected thermometer"),
         }
@@ -99,14 +99,14 @@ mod tests {
         room.add_device("socket", SmartSocket::new(true, 100.0));
 
         match room.get_device_mut("socket") {
-            Some(SmartDevice::Socket(socket)) => socket.turn_off(),
+            Some(SmartDevice::Socket(socket)) => socket.turn_off().unwrap(),
             _ => panic!("expected socket"),
         }
 
         match room.get_device("socket") {
             Some(SmartDevice::Socket(socket)) => {
-                assert!(!socket.is_on());
-                assert_eq!(socket.get_power(), 0.0);
+                assert!(!socket.is_on().unwrap());
+                assert_eq!(socket.get_power().unwrap(), 0.0);
             }
             _ => panic!("expected socket"),
         }
@@ -130,7 +130,7 @@ mod tests {
 
         match room.get_device("thermometer") {
             Some(SmartDevice::Thermometer(thermometer)) => {
-                assert_eq!(thermometer.get_temperature(), 22.0);
+                assert_eq!(thermometer.get_temperature().unwrap(), 22.0);
             }
             _ => panic!("expected thermometer"),
         }

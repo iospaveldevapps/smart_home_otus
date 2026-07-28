@@ -126,14 +126,14 @@ mod tests {
         home.add_room("living room", room);
 
         match home.get_smart_device_mut("living room", "socket") {
-            Ok(SmartDevice::Socket(socket)) => socket.turn_off(),
+            Ok(SmartDevice::Socket(socket)) => socket.turn_off().unwrap(),
             _ => panic!("expected socket"),
         }
 
         match home.get_smart_device("living room", "socket") {
             Ok(SmartDevice::Socket(socket)) => {
-                assert!(!socket.is_on());
-                assert_eq!(socket.get_power(), 0.0);
+                assert!(!socket.is_on().unwrap());
+                assert_eq!(socket.get_power().unwrap(), 0.0);
             }
             _ => panic!("expected socket"),
         }

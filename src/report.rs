@@ -5,3 +5,9 @@ pub trait Report {
         println!("{}", self.report());
     }
 }
+
+impl<T: Report + ?Sized> Report for &T {
+    fn report(&self) -> String {
+        (**self).report()
+    }
+}

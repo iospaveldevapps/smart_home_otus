@@ -3,3 +3,6 @@ name = "smart_home"
 version = "0.1.0"
 edition = "2024"
 default-run = "smart_home"
+
+[workspace]
+members = ["smart_socket", "socket_static_demo", "socket_dynamic_demo"]

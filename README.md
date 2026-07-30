@@ -1,7 +1,47 @@
 27.04.26 - Added HW_1  
 25.05.26 - Added HW_2  
 28.07.26 - Added HW_3  
-30.07.26 - Added HW_5
+30.07.26 - Added HW_5  
+30.07.26 - Added HW_6
+
+## HW_6: Smart home web service
+
+Workspace packages:
+
+- `smart_home_web` — backend: REST API (axum) over the smart home library;
+- `smart_home_client` — frontend: interactive console client (reqwest).
+
+Run the backend (address configurable via `SMART_HOME_ADDR`, default `127.0.0.1:8080`):
+
+```sh
+cargo run -p smart_home_web
+```
+
+Run the frontend in another terminal (address as the first argument or `SMART_HOME_URL`):
+
+```sh
+cargo run -p smart_home_client
+```
+
+REST API:
+
+| Method   | Path                              | Description                        |
+| -------- | --------------------------------- | ---------------------------------- |
+| `GET`    | `/rooms`                          | list rooms                         |
+| `POST`   | `/rooms`                          | add a room `{"name": ...}`         |
+| `GET`    | `/rooms/{room}`                   | room info                          |
+| `DELETE` | `/rooms/{room}`                   | remove a room                      |
+| `GET`    | `/rooms/{room}/devices`           | list devices in a room             |
+| `POST`   | `/rooms/{room}/devices`           | add a device                       |
+| `GET`    | `/rooms/{room}/devices/{device}`  | device info                        |
+| `DELETE` | `/rooms/{room}/devices/{device}`  | remove a device                    |
+| `GET`    | `/report`                         | full home report                   |
+
+A device is described as `{"name": ..., "type": "socket", "is_on": bool, "power": f32}`
+or `{"name": ..., "type": "thermometer", "temperature": f32}`.
+
+Functional tests (`smart_home_web/tests/api.rs`) start the backend on a random
+port and talk to it over HTTP: `cargo test -p smart_home_web`.
 
 ## HW_5: C-style smart socket
 

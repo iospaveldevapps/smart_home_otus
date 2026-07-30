@@ -55,6 +55,18 @@ impl SmartHome {
         self.rooms.get_mut(name)
     }
 
+    /// Iterates over `(name, room)` pairs in arbitrary order.
+    pub fn rooms(&self) -> impl Iterator<Item = (&str, &Room)> {
+        self.rooms.iter().map(|(name, room)| (name.as_str(), room))
+    }
+
+    /// Room names sorted alphabetically.
+    pub fn room_names(&self) -> Vec<String> {
+        let mut names: Vec<_> = self.rooms.keys().cloned().collect();
+        names.sort();
+        names
+    }
+
     pub fn get_smart_device(
         &self,
         room_name: &str,

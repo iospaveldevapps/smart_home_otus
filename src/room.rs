@@ -20,7 +20,7 @@ impl<F: FnMut(&str, &SmartDevice)> Subscriber for F {
 #[derive(Default)]
 pub struct Room {
     devices: HashMap<String, SmartDevice>,
-    subscribers: Vec<Box<dyn Subscriber>>,
+    subscribers: Vec<Box<dyn Subscriber + Send>>,
 }
 
 impl fmt::Debug for Room {
@@ -45,7 +45,7 @@ impl Room {
     }
 
     /// Registers a callback fired every time a device is added to the room.
-    pub fn subscribe(&mut self, subscriber: impl Subscriber + 'static) {
+    pub fn subscribe(&mut self, subscriber: impl Subscriber + Send + 'static) {
         self.subscribers.push(Box::new(subscriber));
     }
 
@@ -75,6 +75,20 @@ impl Room {
 
     pub fn get_device_mut(&mut self, name: &str) -> Option<&mut SmartDevice> {
         self.devices.get_mut(name)
+    }
+
+    /// Iterates over `(name, device)` pairs in arbitrary order.
+    pub fn devices(&self) -> impl Iterator<Item = (&str, &SmartDevice)> {
+        self.devices
+            .iter()
+            .map(|(name, device)| (name.as_str(), device))
+    }
+
+    /// Device names sorted alphabetically.
+    pub fn device_names(&self) -> Vec<String> {
+        let mut names: Vec<_> = self.devices.keys().cloned().collect();
+        names.sort();
+        names
     }
 }
 
@@ -115,49 +129,49 @@ macro_rules! smart_room {
 
 #[cfg(test)]
 mod tests {
-    use std::cell::RefCell;
-    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
 
     use super::{Room, Subscriber};
     use crate::{Report, SmartDevice, SmartSocket, SmartThermometer};
 
     #[test]
     fn notifies_closure_subscriber_on_device_added() {
-        let events = Rc::new(RefCell::new(Vec::new()));
+        let events = Arc::new(Mutex::new(Vec::new()));
 
         let mut room = Room::new();
         room.subscribe({
-            let events = Rc::clone(&events);
+            let events = Arc::clone(&events);
             move |name: &str, _device: &SmartDevice| {
-                events.borrow_mut().push(name.to_string());
+                events.lock().unwrap().push(name.to_string());
             }
         });
 
         room.add_device("socket", SmartSocket::new(true, 100.0));
         room.add_device("thermometer", SmartThermometer::new(20.0));
 
-        assert_eq!(*events.borrow(), ["socket", "thermometer"]);
+        assert_eq!(*events.lock().unwrap(), ["socket", "thermometer"]);
     }
 
     #[test]
     fn notifies_object_subscriber_on_device_added() {
-        struct EventLog(Rc<RefCell<Vec<String>>>);
+        struct EventLog(Arc<Mutex<Vec<String>>>);
 
         impl Subscriber for EventLog {
             fn on_device_added(&mut self, name: &str, device: &SmartDevice) {
                 self.0
-                    .borrow_mut()
+                    .lock()
+                    .unwrap()
                     .push(format!("{name}: {}", device.report()));
             }
         }
 
-        let events = Rc::new(RefCell::new(Vec::new()));
+        let events = Arc::new(Mutex::new(Vec::new()));
 
         let mut room = Room::new();
-        room.subscribe(EventLog(Rc::clone(&events)));
+        room.subscribe(EventLog(Arc::clone(&events)));
         room.add_device("socket", SmartSocket::new(true, 100.0));
 
-        let events = events.borrow();
+        let events = events.lock().unwrap();
         assert_eq!(events.len(), 1);
         assert!(events[0].starts_with("socket: Умная розетка"));
     }

@@ -9,7 +9,7 @@
 Workspace packages:
 
 - `smart_home_web` — backend: REST API (axum) over the smart home library;
-- `smart_home_client` — frontend: interactive console client (reqwest).
+- `smart_home_client` — browser frontend written in Rust with Yew and compiled to WebAssembly.
 
 Run the backend (address configurable via `SMART_HOME_ADDR`, default `127.0.0.1:8080`):
 
@@ -17,11 +17,22 @@ Run the backend (address configurable via `SMART_HOME_ADDR`, default `127.0.0.1:
 cargo run -p smart_home_web
 ```
 
-Run the frontend in another terminal (address as the first argument or `SMART_HOME_URL`):
+Install the WebAssembly target and Trunk once:
 
 ```sh
-cargo run -p smart_home_client
+rustup target add wasm32-unknown-unknown
+cargo install trunk
 ```
+
+Run the frontend in another terminal:
+
+```sh
+cd smart_home_client
+trunk serve
+```
+
+Open `http://127.0.0.1:8081`. The frontend connects to the REST backend at
+`http://127.0.0.1:8080` and supports rooms, devices, and the home report.
 
 REST API:
 

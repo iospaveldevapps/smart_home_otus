@@ -19,6 +19,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
+use tower_http::cors::{Any, CorsLayer};
 
 use smart_home::{Report, Room, SmartDevice, SmartHome, SmartSocket, SmartThermometer};
 
@@ -36,6 +37,12 @@ pub fn app(home: SharedHome) -> Router {
             get(get_device).delete(remove_device),
         )
         .route("/report", get(home_report))
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any),
+        )
         .with_state(home)
 }
 
